@@ -1,26 +1,173 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:is(.dark *));
+
+/*
+  Ink & Amber.
+  One accent, used sparingly. Type and spacing carry the page; amber only appears
+  where the eye is meant to go — a primary action, an active state, a number that
+  matters. Dark is the identity; the light theme is the same system inverted onto
+  warm paper rather than a second palette.
+*/
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #faf8f5;
+  --surface: #ffffff;
+  --surface-2: #f2efe9;
+  --foreground: #101010;
+  --muted: #605c56;
+  --border: #e4e0d9;
+  --brand: #9a5b00;
+  --brand-strong: #7a4700;
+  --brand-soft: #fdf3e1;
+  --on-brand: #ffffff;
+  --accent: #b4700a;
+  --accent-soft: #fbf1df;
+  --ring: #9a5b00;
+  --success: #1a7f37;
+  --warning: #b54708;
+}
+
+.dark {
+  --background: #08090b;
+  --surface: #101216;
+  --surface-2: #171a20;
+  --foreground: #f2f3f5;
+  --muted: #8b9099;
+  --border: #1e2127;
+  --brand: #f5a524;
+  --brand-strong: #ffbe47;
+  --brand-soft: #21180a;
+  --on-brand: #08090b;
+  --accent: #c77b12;
+  --accent-soft: #1a1409;
+  --ring: #f5a524;
+  --success: #3fb950;
+  --warning: #d29922;
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-soft: var(--brand-soft);
+  --color-on-brand: var(--on-brand);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+
+  --radius-card: 0.75rem;
+
+  --animate-marquee: marquee 45s linear infinite;
+  --animate-fade-up: fade-up 0.6s ease-out both;
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: var(--brand);
+    color: var(--on-brand);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+}
+
+@layer utilities {
+  /* Amber is the only hue that ever gradients, and only into itself. */
+  .text-gradient {
+    background: linear-gradient(100deg, var(--foreground) 15%, var(--brand) 70%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .surface-grid {
+    background-image:
+      linear-gradient(to right, color-mix(in oklab, var(--border) 70%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in oklab, var(--border) 70%, transparent) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 100%);
+  }
+
+  .glow {
+    background: radial-gradient(
+      720px circle at 50% -10%,
+      color-mix(in oklab, var(--brand) 14%, transparent),
+      transparent 65%
+    );
+  }
+
+  .mask-fade-x {
+    mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+  }
+
+  /* Hairline rule that fades out — used to separate disciplined type blocks. */
+  .rule-fade {
+    height: 1px;
+    background: linear-gradient(to right, var(--border), transparent);
+  }
+}
+
+/*
+  Motion is opt-in per element via data-animate, so server-rendered content is
+  always visible if JavaScript never arrives. GSAP sets the initial state itself
+  once it takes ownership.
+*/
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
