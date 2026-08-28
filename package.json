@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "admin:hash": "node scripts/hash-password.mjs",
-    "db:push": "psql \"$SUPABASE_DB_URL\" -v ON_ERROR_STOP=1 -f supabase/schema.sql"
+    "db:push": "psql \"$SUPABASE_DB_URL\" -v ON_ERROR_STOP=1 -f supabase/schema.sql",
+    "test:auth": "node --conditions=react-server --experimental-strip-types --no-warnings scripts/auth.test.mts"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

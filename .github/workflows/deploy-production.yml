@@ -1,0 +1,80 @@
+name: Deploy production
+
+# Pushes to main go live, but only behind the same CI gate as a pull request.
+
+on:
+  push:
+    branches: [main]
+  # Lets you re-deploy the current main from the Actions tab without an empty
+  # commit — useful after changing an environment variable in Vercel.
+  workflow_dispatch:
+
+# Never cancel a production deploy in flight; queue it behind the running one.
+concurrency:
+  group: production
+  cancel-in-progress: false
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  deploy:
+    name: Build and deploy
+    needs: ci
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.url }}
+
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Pull production environment
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy
+        id: deploy
+        run: |
+          url=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          echo "Production: $url" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Smoke test the deployment
+        # A green build that 500s on the homepage is not a successful deploy.
+        # Checks the public site, and that the console still redirects a
+        # signed-out visitor rather than exposing itself.
+        run: |
+          set -euo pipefail
+          url="${{ steps.deploy.outputs.url }}"
+
+          home=$(curl -s -o /dev/null -w '%{http_code}' "$url/")
+          echo "GET /            -> $home"
+          [ "$home" = "200" ] || { echo "Homepage did not return 200"; exit 1; }
+
+          contact=$(curl -s -o /dev/null -w '%{http_code}' "$url/contact")
+          echo "GET /contact     -> $contact"
+          [ "$contact" = "200" ] || { echo "Contact page did not return 200"; exit 1; }
+
+          aka=$(curl -s -o /dev/null -w '%{http_code}' "$url/aka")
+          echo "GET /aka         -> $aka"
+          case "$aka" in
+            30*) echo "Console correctly redirects when signed out" ;;
+            *)   echo "Console did not redirect — expected a 3xx, got $aka"; exit 1 ;;
+          esac
+
+          echo "Smoke tests passed" >> "$GITHUB_STEP_SUMMARY"

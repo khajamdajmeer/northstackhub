@@ -1,0 +1,65 @@
+name: CI
+
+# Quality gate. Runs on every pull request and every push to main, and is a
+# required dependency of the deploy workflows — nothing reaches Vercel without
+# passing here first.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  # Lets the deploy workflows depend on this one.
+  workflow_call:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Lint, types, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Build
+        # The build must succeed without any secret. Nothing here reads the
+        # database at build time: every /aka route is force-dynamic, so a
+        # missing SUPABASE_SECRET_KEY cannot break the build — and if that ever
+        # changes, this step is where it surfaces.
+        run: npm run build
+
+  auth-tests:
+    name: Admin auth
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Verify password hashing and session tokens
+        run: npm run test:auth
