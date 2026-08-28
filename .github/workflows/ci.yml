@@ -4,16 +4,13 @@ name: CI
 # required dependency of the deploy workflows — nothing reaches Vercel without
 # passing here first.
 
+# Called by the deploy workflows rather than triggered directly. Listening for
+# `pull_request` and `push` here as well would start a second, identical run of
+# this workflow for the same event, and the two would fight over the concurrency
+# group — which is exactly what happened on the first run.
 on:
-  pull_request:
-  push:
-    branches: [main]
-  # Lets the deploy workflows depend on this one.
   workflow_call:
-
-concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  workflow_dispatch:
 
 jobs:
   verify:
