@@ -26,7 +26,7 @@ import { CtaSection } from "@/components/site/cta-section";
 import { ServiceIcon } from "@/components/site/service-icon";
 
 const description =
-  "NorthStackHub is a small, remote-first software studio running on three principles — focus, discipline and consistency. We build web and mobile applications, RAG and agentic AI systems, role-based platforms, learning products and interactive 3D work for founders and product teams worldwide.";
+  "NorthStackHub is a small, remote-first software studio running on three promises — one project at a time, built to last, and no chasing us for an update. We build web and mobile applications, RAG and agentic AI systems, role-based platforms, learning products and interactive 3D work for founders and product teams worldwide.";
 
 export const metadata: Metadata = {
   title: "About us",
@@ -81,10 +81,10 @@ export default function AboutPage() {
         eyebrow="About us"
         title={
           <>
-            Three words we <span className="text-gradient">actually run on</span>
+            Three promises we <span className="text-gradient">actually run on</span>
           </>
         }
-        description="Focus, discipline and consistency are not a strapline. They decide how many projects we take at once, what ships with every build, and what you hear from us on a Friday. This page explains what each one costs us and what it buys you."
+        description="These are commitments, not a strapline. They decide how many projects we take at once, what ships with every build, and what you hear from us on a Friday. This page explains what each one costs us and what it buys you."
       >
         <ButtonLink href="/contact" size="lg">
           Work with us

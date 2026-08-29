@@ -33,7 +33,7 @@ export const metadata: Metadata = {
  * service appears in more than one pkg, prefer the pkg that actually contains the
  * package priced at the service's published starting price.
  */
-function gigForService(service: Service) {
+function packageForService(service: Service) {
   const matches = packages.filter((pkg) => pkg.services.includes(service.slug));
   return (
     matches.find((pkg) => pkg.tiers.some((tier) => `$${tier.priceUsd}` === service.startingAt)) ??
@@ -98,7 +98,7 @@ export default function ServicesPage() {
 
           <div className="mt-12 grid gap-5 md:grid-cols-2">
             {services.map((service, index) => {
-              const pkg = gigForService(service);
+              const pkg = packageForService(service);
 
               return (
                 /*

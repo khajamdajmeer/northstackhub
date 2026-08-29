@@ -438,3 +438,68 @@ MHB 2025, Fashion Storefront 2024, Bludgers Automotive 2023.
   unreferenced and can be deleted.
 - Upwork, GitHub and LinkedIn handles in `siteConfig.links` are still
   placeholders.
+
+---
+
+## Session: 2026-08-29 — principles reworked into promises
+
+### Current objective
+
+Replace the home page's three abstract virtues with commitments a client can
+check, and carry the change through the site-wide strapline.
+
+### Completed work
+
+**Focus / Discipline / Consistency → One at a time / Built to last / No
+chasing.** Every agency claims focus and discipline, so the words carried no
+information and nothing could be held to them. Each replacement is a promise
+with a `proof` line attached. The three `description` fields were left untouched
+— they already argued for the new headings without naming the old virtues.
+
+Tagline is now "One at a time. Built to last. No chasing." Changed alongside the
+panels so the browser title, social cards and About page do not contradict the
+home page.
+
+**Wording was constrained by the renderers, not by taste.** `principle.word` is
+set at up to 96px in `pinned-sequence.tsx` and again in a one-third-width strip
+in `hero.tsx` at `tracking-[0.2em] uppercase`. "Consistency" (11 chars) was
+already at the width limit, so the promises were capped at 10–13 characters —
+"Built to survive" (16) was rejected for "Built to last" on those grounds. Equal
+lengths also keep the pinned steps the same height as they cross-dissolve. Hero
+tracking was eased to `0.12em` with `text-balance` to buy room at the `sm`
+breakpoint.
+
+Two places hardcode the words rather than reading the array, and both were
+updated by hand: `opengraph-image.tsx` (the rendered PNG footer) and
+`about/page.tsx` (meta description, PageHero title "Three words" → "Three
+promises", and its description).
+
+### Fixed along the way
+
+- **Home `<title>` was 72 chars with the brand name twice** —
+  "NorthStackHub — … | NorthStackHub". The root layout's `%s | NorthStackHub`
+  template was being applied to a title that already opened with the name.
+  Pre-existing, but the longer tagline pushed it past where search results
+  truncate. Home now uses `title: { absolute: … }`; 59 chars. Other pages keep
+  the template.
+- **README still mentioned Fiverr.** The earlier removal cleaned `src/` only —
+  the "Editing content" section still described `pricing.ts` as Fiverr gigs and
+  pointed reviews at the Fiverr profile. Now clean.
+- **`gigForService` in `services/page.tsx`** survived the earlier rename;
+  now `packageForService`.
+
+### Verification
+
+`npm run lint` clean · `npx tsc --noEmit` clean · `npm run test:auth` 15/15 ·
+`npm run build` succeeds. Against a production server: home `<title>` correct at
+59 chars, all three phrases render, `/about` shows "Three promises we", and the
+OG PNG was rendered and inspected — the footer reads
+"ONE AT A TIME · BUILT TO LAST · NO CHASING" opposite the domain with no
+collision.
+
+### Remaining tasks
+
+- Client names for the case studies in `projects.ts` — still not supplied, and
+  deliberately not invented.
+- Worth eyeballing the hero strip at a ~640px viewport once deployed; the
+  character budget says it fits, but that was reasoned, not seen.

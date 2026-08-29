@@ -6,8 +6,10 @@ agentic AI systems, e-commerce, payments, role-based platforms, learning
 products, portfolios and blogs, plus the cloud deployment and maintenance
 underneath them.
 
-The studio runs on three words, and the site is built to argue for them rather
-than just print them: **Focus. Discipline. Consistency.**
+The studio runs on three promises, and the site is built to argue for them
+rather than just print them: **One at a time. Built to last. No chasing.**
+Each one carries a `proof` field, because a promise nobody can check is a
+slogan.
 
 ## Stack
 
@@ -90,12 +92,12 @@ fails loudly if a field is missing.
 
 | File | Holds |
 | --- | --- |
-| `src/config/site.ts` | Company name, email, phone, hours, stats, social and marketplace links, navigation, and the three `principles` |
+| `src/config/site.ts` | Company name, email, phone, hours, stats, social links, navigation, and the three `principles` |
 | `src/content/services.ts` | The 14 services — summary, outcomes, deliverables, stack, timeline, optional price, FAQs |
 | `src/content/projects.ts` | Real projects — challenge, approach, delivered scope, stack, screenshot |
 | `src/content/posts.ts` | Blog articles, bodies in GitHub-flavoured Markdown |
 | `src/content/company.ts` | Process steps, values, differentiators, tech stack, testimonials, FAQs |
-| `src/content/pricing.ts` | The live Fiverr gigs and their package tiers |
+| `src/content/pricing.ts` | The fixed-scope packages and their tiers |
 
 Adding a service, project or post is a matter of appending one object — routing,
 sitemap entries, related-content links and metadata all derive from these arrays.
@@ -108,14 +110,14 @@ The site deliberately carries no invented facts. Three rules hold it that way:
   the running interface in `/public/work`. Entries carry `scope` (what was
   built) rather than results, because the outcomes were never measured. No live
   URLs are published.
-- **Prices mirror the Fiverr gigs.** `pricing.ts` is a transcription of the
-  three live gigs — package names, prices, delivery days, revisions and
-  contents. **If a gig changes on Fiverr, change it here in the same sitting.**
-  A client comparing the two should never find a difference. Services with no
-  matching gig carry no price and say so.
+- **Prices are real quotes.** `pricing.ts` holds the fixed-scope packages —
+  names, prices, delivery days, revisions and contents. **If a package price
+  changes, change it here in the same sitting.** A client comparing this page to
+  their quote should never find a difference. Services with no matching package
+  carry no price and say so.
 - **There are no testimonials.** `testimonials` in `company.ts` is an empty
   array on purpose; the sections that consume it disappear until real reviews
-  are added. Reviews are pointed at the Fiverr profile instead.
+  are added. The site offers a reference on request instead.
 
 > **Still to confirm before launch:** the Upwork, GitHub and LinkedIn links in
 > `siteConfig.links` — all still placeholders. Have `/privacy` and `/terms`

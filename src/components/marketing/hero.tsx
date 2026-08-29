@@ -96,7 +96,10 @@ export function Hero() {
             {principles.map((principle) => (
               <li key={principle.word} className="flex items-baseline gap-3 py-5 sm:px-6 sm:first:pl-0 sm:last:pr-0">
                 <span className="font-mono text-xs text-brand">{principle.index}</span>
-                <span className="text-sm font-medium tracking-[0.2em] uppercase">
+                {/* Tracking is tighter than the usual 0.2em: these are short
+                    phrases rather than single words, and a third of a 640px
+                    viewport does not have the room for both. */}
+                <span className="text-sm font-medium tracking-[0.12em] text-balance uppercase">
                   {principle.word}
                 </span>
               </li>

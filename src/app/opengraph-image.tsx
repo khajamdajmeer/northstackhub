@@ -76,7 +76,7 @@ export default function OpengraphImage() {
         >
           <div>{siteConfig.domain}</div>
           <div style={{ letterSpacing: 2, textTransform: "uppercase", fontSize: 20 }}>
-            Focus · Discipline · Consistency
+            One at a time · Built to last · No chasing
           </div>
         </div>
       </div>

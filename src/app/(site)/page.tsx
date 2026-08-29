@@ -14,7 +14,10 @@ import { LatestPosts } from "@/components/marketing/latest-posts";
 import { CtaSection } from "@/components/site/cta-section";
 
 export const metadata: Metadata = {
-  title: `${siteConfig.name} — ${siteConfig.tagline}`,
+  // `absolute` opts out of the root layout's "%s | NorthStackHub" template,
+  // which would otherwise append the studio name to a title that already opens
+  // with it — 72 characters, and the tail truncated in search results.
+  title: { absolute: `${siteConfig.name} — ${siteConfig.tagline}` },
   description: siteConfig.description,
   alternates: { canonical: "/" },
 };
