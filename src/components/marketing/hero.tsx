@@ -81,8 +81,8 @@ export function Hero() {
           <Reveal delay={0.4}>
             <p className="text-sm text-muted">
               {siteConfig.responseTime} · Free 30-minute scoping call ·{" "}
-              <Link href="/pricing" className="text-brand underline-offset-4 hover:underline">
-                or start from a fixed-price package
+              <Link href="/packages" className="text-brand underline-offset-4 hover:underline">
+                or start from a defined package
               </Link>
             </p>
           </Reveal>

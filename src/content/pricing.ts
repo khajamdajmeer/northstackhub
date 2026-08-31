@@ -1,19 +1,13 @@
 /**
- * Real pricing for the fixed-scope packages.
+ * The fixed-scope packages, by what they contain rather than what they cost.
  *
- * The INR figure is the listed price; the USD figure is the same package
- * converted at ₹83.44 = $1, so treat USD as indicative and INR as
- * authoritative.
- *
- * Every number here is one that was actually quoted. If a package changes,
- * change it here in the same sitting — a client comparing a quote to this page
- * should never find a difference.
+ * Figures are deliberately absent: nothing here is published, and a number is
+ * given in writing after a scoping call. Keep it that way — the moment a price
+ * lands in this file it is on the public site.
  */
 
 export type PackageTier = {
   name: string;
-  priceUsd: number;
-  priceInr: number;
   deliveryDays: number;
   revisions: number;
   description: string;
@@ -33,9 +27,6 @@ export type ServicePackage = {
   tiers: PackageTier[];
 };
 
-export const currencyNote =
-  "Prices shown in USD, converted from the listed INR pricing at ₹83.44 = $1. You will be invoiced in your own currency.";
-
 export const packages: ServicePackage[] = [
   {
     slug: "rag-chatbot",
@@ -48,8 +39,6 @@ export const packages: ServicePackage[] = [
     tiers: [
       {
         name: "RAG Starter",
-        priceUsd: 108,
-        priceInr: 9012,
         deliveryDays: 3,
         revisions: 2,
         description:
@@ -58,8 +47,6 @@ export const packages: ServicePackage[] = [
       },
       {
         name: "RAG Pro",
-        priceUsd: 300,
-        priceInr: 25033,
         deliveryDays: 7,
         revisions: 2,
         description:
@@ -74,8 +61,6 @@ export const packages: ServicePackage[] = [
       },
       {
         name: "RAG Platform",
-        priceUsd: 540,
-        priceInr: 45059,
         deliveryDays: 14,
         revisions: 3,
         description:
@@ -101,8 +86,6 @@ export const packages: ServicePackage[] = [
     tiers: [
       {
         name: "Frontend App",
-        priceUsd: 96,
-        priceInr: 8010,
         deliveryDays: 3,
         revisions: 2,
         description:
@@ -111,8 +94,6 @@ export const packages: ServicePackage[] = [
       },
       {
         name: "Full-Stack + Deploy",
-        priceUsd: 114,
-        priceInr: 9512,
         deliveryDays: 7,
         revisions: 2,
         description:
@@ -128,8 +109,6 @@ export const packages: ServicePackage[] = [
       },
       {
         name: "Production-Ready",
-        priceUsd: 240,
-        priceInr: 20026,
         deliveryDays: 14,
         revisions: 3,
         description:
@@ -155,8 +134,6 @@ export const packages: ServicePackage[] = [
     tiers: [
       {
         name: "Go Live",
-        priceUsd: 30,
-        priceInr: 2503,
         deliveryDays: 1,
         revisions: 2,
         description: "Your app deployed live to Render, Railway or Vercel with a working public URL.",
@@ -170,8 +147,6 @@ export const packages: ServicePackage[] = [
       },
       {
         name: "Production",
-        priceUsd: 66,
-        priceInr: 5507,
         deliveryDays: 3,
         revisions: 3,
         description:
@@ -187,8 +162,6 @@ export const packages: ServicePackage[] = [
       },
       {
         name: "Full Setup",
-        priceUsd: 96,
-        priceInr: 8010,
         deliveryDays: 5,
         revisions: 5,
         description:
@@ -205,15 +178,6 @@ export const packages: ServicePackage[] = [
   },
 ];
 
-export function getPackage(slug: string) {
-  return packages.find((pkg) => pkg.slug === slug);
-}
-
-/** Lowest tier price across every package — the honest "from" number. */
-export const lowestPackagePriceUsd = Math.min(
-  ...packages.flatMap((pkg) => pkg.tiers.map((tier) => tier.priceUsd)),
-);
-
 /**
  * Work that does not fit a fixed package. No numbers here on purpose: these are
  * quoted after a call, and publishing an invented range would be a guess.
@@ -222,7 +186,7 @@ export const customEngagements = [
   {
     title: "Larger builds",
     description:
-      "Multi-month products, mobile apps, e-commerce platforms and learning systems. Scoped in writing first, then quoted as fixed-price milestones.",
+      "Multi-month products, mobile apps, e-commerce platforms and learning systems. Scoped in writing first, then agreed as fixed milestones.",
     signal: "Quoted after a scoping call",
   },
   {
@@ -241,14 +205,14 @@ export const customEngagements = [
 
 export const engagementNotes = [
   {
-    title: "Fixed scope, fixed price",
+    title: "Fixed scope, one number",
     description:
-      "Every package above is a defined deliverable at a defined price. You approve the scope before work starts, and the number does not move unless the scope does.",
+      "Every package above is a defined deliverable with a defined delivery time. You approve the scope and the number before work starts, and the number does not move unless the scope does.",
   },
   {
     title: "Starting small",
     description:
-      "Smaller, well-defined work runs as a single fixed-price package, invoiced on delivery. Most first-time clients start here before committing to a larger build.",
+      "Smaller, well-defined work runs as a single package, invoiced on delivery. Most first-time clients start here before committing to a larger build.",
   },
   {
     title: "Larger engagements",

@@ -186,8 +186,8 @@ export default function ProcessPage() {
           Start with a discovery call
           <ArrowRight className="size-4" aria-hidden />
         </ButtonLink>
-        <ButtonLink href="/pricing" variant="secondary" size="lg">
-          See pricing
+        <ButtonLink href="/packages" variant="secondary" size="lg">
+          See the packages
         </ButtonLink>
       </PageHero>
 
@@ -437,11 +437,11 @@ export default function ProcessPage() {
             <Badge tone="neutral">Retainers are optional</Badge>
             <p className="max-w-2xl text-sm leading-relaxed text-muted">
               Plenty of clients take the documentation and run the product themselves. Others keep
-              us on for monitoring and a monthly block of hours. Both are normal, and we price the
-              build the same either way.
+              us on for monitoring and a monthly block of hours. Both are normal, and the build
+              is scoped the same either way.
             </p>
-            <ButtonLink href="/pricing" variant="secondary">
-              Compare retainers
+            <ButtonLink href="/contact" variant="secondary">
+              Ask about a retainer
               <ArrowRight className="size-4" aria-hidden />
             </ButtonLink>
           </div>

@@ -8,7 +8,6 @@ import {
   ArrowUpRight,
   CalendarDays,
   Check,
-  CircleDollarSign,
   Clock,
   FileText,
   MessageSquare,
@@ -53,10 +52,6 @@ function relatedProjects(service: Service): Project[] {
 /** Every pkg that delivers against this service — a service can sit inside more than one. */
 function packagesForService(service: Service): ServicePackage[] {
   return packages.filter((pkg) => pkg.services.includes(service.slug));
-}
-
-function fromPriceUsd(pkg: ServicePackage) {
-  return Math.min(...pkg.tiers.map((tier) => tier.priceUsd));
 }
 
 function deliveryRange(pkg: ServicePackage) {
@@ -161,8 +156,8 @@ export default async function ServiceDetailPage({
             {service.timeline}
           </Badge>
           <Badge>
-            <CircleDollarSign className="size-3.5" aria-hidden />
-            {service.startingAt ? `Packages from ${service.startingAt}` : "Quoted per project"}
+            <FileText className="size-3.5" aria-hidden />
+            Scoped and quoted in writing
           </Badge>
         </span>
       </PageHero>
@@ -277,12 +272,10 @@ export default async function ServiceDetailPage({
                 <dl className="grid gap-4 border-t border-border pt-6 text-sm">
                   <div className="flex items-center justify-between gap-3">
                     <dt className="inline-flex items-center gap-2 text-muted">
-                      <CircleDollarSign className="size-4" aria-hidden />
-                      Price
+                      <FileText className="size-4" aria-hidden />
+                      Scope
                     </dt>
-                    <dd className="font-semibold">
-                      {service.startingAt ? `From ${service.startingAt}` : "Scoped on a call"}
-                    </dd>
+                    <dd className="font-semibold">Agreed before work starts</dd>
                   </div>
                   <div className="flex items-center justify-between gap-3">
                     <dt className="inline-flex items-center gap-2 text-muted">
@@ -305,17 +298,17 @@ export default async function ServiceDetailPage({
                       >
                         <p className="text-sm font-semibold tracking-tight">{pkg.title}</p>
                         <p className="font-mono text-xs text-muted">
-                          from ${fromPriceUsd(pkg)} · {deliveryRange(pkg)}
+                          {pkg.tiers.length} tiers · {deliveryRange(pkg)}
                         </p>
                         <p className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
                           <Link
-                            href={`/pricing#${pkg.slug}`}
+                            href={`/packages#${pkg.slug}`}
                             className="font-medium text-brand underline-offset-4 hover:underline"
                           >
                             See what is included
                           </Link>
                           <Link
-                            href="/pricing"
+                            href="/packages"
                             className="text-muted underline-offset-4 hover:text-foreground hover:underline"
                           >
                             All packages
@@ -439,9 +432,7 @@ export default async function ServiceDetailPage({
                   <p className="text-sm leading-relaxed text-muted text-pretty">{other.short}</p>
                   <p className="mt-auto flex items-center justify-between gap-3 border-t border-border pt-4 text-sm">
                     <span className="text-muted">{other.timeline}</span>
-                    <span className="font-medium">
-                      {other.startingAt ? `From ${other.startingAt}` : "Quoted per project"}
-                    </span>
+                    <span className="font-medium">Scoped per project</span>
                   </p>
                 </Card>
               </Link>
@@ -459,11 +450,7 @@ export default async function ServiceDetailPage({
 
       <CtaSection
         title={`Need ${service.title.toLowerCase()}?`}
-        description={
-          service.startingAt
-            ? `Tell us what you are working with — existing code, a blank repo, or a deadline you are worried about. Packages for this start at ${service.startingAt}, and anything outside them gets a written scope and a number within 24 hours.`
-            : "Tell us what you are working with — existing code, a blank repo, or a deadline you are worried about. This one is quoted per project: you get a written scope and a fixed number within 24 hours."
-        }
+        description="Tell us what you are working with — existing code, a blank repo, or a deadline you are worried about. You get a written scope and a fixed number within 24 hours."
       />
     </>
   );

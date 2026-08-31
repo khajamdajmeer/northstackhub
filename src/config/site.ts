@@ -12,9 +12,9 @@ export const siteConfig = {
   description:
     "NorthStackHub builds software end to end — web and mobile applications, RAG and agentic AI systems, e-commerce, payments, role-based platforms and learning products. Next.js and React on the front, FastAPI and Node behind it, deployed on AWS or Azure and maintained afterwards.",
   email: "info@northstackhub.com",
-  phone: "+91 63002 07822",
-  location: "Hyderabad, India · Working remotely with clients worldwide",
-  hours: "Mon–Sat · 9:00–19:00 IST (GMT+5:30) · Async updates daily",
+  phone: "+91 94413 62037",
+  location: "New Jersey, USA · Hyderabad, India",
+  hours: "Mon–Sat · 9:00–19:00 IST · 8:00–17:00 ET · Async updates daily",
   responseTime: "Replies within 4 business hours",
   founded: 2023,
   links: {
@@ -26,10 +26,12 @@ export const siteConfig = {
     calendar: "https://cal.com/northstackhub/30min",
   },
   stats: [
-    { label: "Projects shipped", value: "8+" },
-    { label: "Years building", value: "3+" },
+    { label: "Projects shipped", value: "100+" },
+    { label: "Development hours", value: "5K+" },
     { label: "Stack covered", value: "End to end" },
-    { label: "Based in", value: "Hyderabad" },
+    // Kept short deliberately: these render at text-3xl/text-4xl in three
+    // places, and the full "New Jersey & Hyderabad" wraps badly at that size.
+    { label: "Based in", value: "NJ & Hyderabad" },
   ],
 } as const;
 
@@ -76,7 +78,7 @@ export const mainNav = [
   { title: "Services", href: "/services" },
   { title: "Work", href: "/portfolio" },
   { title: "Process", href: "/process" },
-  { title: "Pricing", href: "/pricing" },
+  { title: "Packages", href: "/packages" },
   { title: "Blog", href: "/blog" },
   { title: "About", href: "/about" },
 ] as const;
@@ -110,7 +112,7 @@ export const footerNav = [
       { title: "About us", href: "/about" },
       { title: "How we work", href: "/process" },
       { title: "Case studies", href: "/portfolio" },
-      { title: "Pricing & packages", href: "/pricing" },
+      { title: "Packages", href: "/packages" },
       { title: "Engineering blog", href: "/blog" },
       { title: "Start a project", href: "/contact" },
     ],

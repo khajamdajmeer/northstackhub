@@ -29,12 +29,6 @@ export type Service = {
   deliverables: string[];
   stack: string[];
   timeline: string;
-  /**
-   * Only set where a fixed-price package covers this service — the figure is
-   * that package's lowest tier. Everything else is quoted after scoping, so the
-   * field is absent rather than carrying a guess.
-   */
-  startingAt?: string;
   faqs: { q: string; a: string }[];
 };
 
@@ -63,7 +57,6 @@ export const services: Service[] = [
     ],
     stack: ["Next.js", "TypeScript", "FastAPI", "PostgreSQL", "Redis", "Docker"],
     timeline: "4–12 weeks",
-    startingAt: "$96",
     faqs: [
       {
         q: "Can you take over an existing codebase?",
@@ -134,7 +127,6 @@ export const services: Service[] = [
     ],
     stack: ["Python", "FastAPI", "pgvector", "LangChain", "OpenAI", "Redis"],
     timeline: "3–10 weeks",
-    startingAt: "$108",
     faqs: [
       {
         q: "Do we need to fine-tune a model?",
@@ -310,7 +302,6 @@ export const services: Service[] = [
     ],
     stack: ["FastAPI", "Python", "Node.js", "NestJS", "OpenAPI", "OpenTelemetry"],
     timeline: "3–10 weeks",
-    startingAt: "$114",
     faqs: [
       {
         q: "FastAPI or Node?",
@@ -381,7 +372,6 @@ export const services: Service[] = [
     ],
     stack: ["Docker", "AWS", "Azure", "Terraform", "GitHub Actions", "Vercel"],
     timeline: "1–6 weeks",
-    startingAt: "$30",
     faqs: [
       {
         q: "AWS or Azure?",

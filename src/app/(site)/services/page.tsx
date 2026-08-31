@@ -12,7 +12,7 @@ import {
 
 import { processSteps, techStack } from "@/content/company";
 import { services, type Service } from "@/content/services";
-import { packages, lowestPackagePriceUsd } from "@/content/pricing";
+import { packages } from "@/content/pricing";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -25,20 +25,19 @@ import { ServiceIcon } from "@/components/site/service-icon";
 export const metadata: Metadata = {
   title: "Services",
   description:
-    "Engineering services covering the whole product lifecycle — Next.js frontends, FastAPI and Node backends, RAG and agentic AI, data layers, payments, cloud deployment and ongoing maintenance. Four of them are available as fixed-price packages; the rest are quoted after scoping.",
+    "Engineering services covering the whole product lifecycle — Next.js frontends, FastAPI and Node backends, RAG and agentic AI, data layers, payments, cloud deployment and ongoing maintenance. Several are available as defined packages; everything is scoped and quoted after a call.",
 };
 
 /**
  * The pkg that sells this service as a fixed-price package, if one does. Where a
  * service appears in more than one pkg, prefer the pkg that actually contains the
- * package priced at the service's published starting price.
+ * package that lists this service.
+ *
+ * The slug array on the package is the real relationship. This used to match on
+ * a price string instead, which broke the moment figures came off the site.
  */
 function packageForService(service: Service) {
-  const matches = packages.filter((pkg) => pkg.services.includes(service.slug));
-  return (
-    matches.find((pkg) => pkg.tiers.some((tier) => `$${tier.priceUsd}` === service.startingAt)) ??
-    matches[0]
-  );
+  return packages.find((pkg) => pkg.services.includes(service.slug));
 }
 
 const engagementModels = [
@@ -46,7 +45,7 @@ const engagementModels = [
     title: "Fixed-scope project",
     icon: SquareStack,
     description:
-      "A written scope, a milestone schedule and one number you approve before work starts. Change requests are quoted separately, so the final invoice matches the first one.",
+      "A written scope, a milestone schedule and one number you approve before work starts. Change requests are agreed separately, so the final invoice matches the first one.",
     bestFor: "Best for a defined build with a launch date",
   },
   {
@@ -82,7 +81,7 @@ export default function ServicesPage() {
           Start a project
           <ArrowRight className="size-4" aria-hidden />
         </ButtonLink>
-        <ButtonLink href="/pricing" variant="secondary" size="lg">
+        <ButtonLink href="/packages" variant="secondary" size="lg">
           See pricing
         </ButtonLink>
       </PageHero>
@@ -144,12 +143,10 @@ export default function ServicesPage() {
                       </span>
                       {pkg ? (
                         <Link
-                          href={`/pricing#${pkg.slug}`}
+                          href={`/packages#${pkg.slug}`}
                           className="relative z-10 inline-flex items-center gap-2 font-medium text-brand underline-offset-4 hover:underline"
                         >
-                          {service.startingAt
-                            ? `Package from ${service.startingAt}`
-                            : "Part of a fixed package"}
+                          Part of a defined package
                           <ArrowUpRight className="size-4" aria-hidden />
                         </Link>
                       ) : (
@@ -262,13 +259,12 @@ export default function ServicesPage() {
           </div>
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
-            <ButtonLink href="/pricing">
+            <ButtonLink href="/packages">
               See the fixed-price packages
               <ArrowRight className="size-4" aria-hidden />
             </ButtonLink>
             <span className="text-sm text-muted">
-              Packages start at ${lowestPackagePriceUsd}. Every model includes a 30-day warranty on what
-              we ship.
+              Every engagement model includes a 30-day warranty on what we ship.
             </span>
           </div>
         </Container>

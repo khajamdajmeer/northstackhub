@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
-import { serviceCategories, services, servicesByCategory } from "@/content/services";
+import { serviceCategories, servicesByCategory } from "@/content/services";
 import { Container } from "@/components/ui/container";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { ServiceIcon } from "@/components/site/service-icon";
@@ -13,8 +13,6 @@ const categoryBlurbs: Record<string, string> = {
   "Platform & data": "The layer underneath — APIs, data, permissions, infrastructure.",
   Experience: "How it looks, moves and ranks.",
 };
-
-const pricedServiceCount = services.filter((service) => service.startingAt).length;
 
 export function ServicesOverview() {
   return (
@@ -57,11 +55,7 @@ export function ServicesOverview() {
 
                     <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 pt-2 font-mono text-xs text-muted">
                       <span>{service.timeline}</span>
-                      {service.startingAt ? (
-                        <span className="text-brand">from {service.startingAt}</span>
-                      ) : (
-                        <span>quoted per project</span>
-                      )}
+                      <span>scoped per project</span>
                     </div>
                   </Link>
                 ))}
@@ -76,11 +70,12 @@ export function ServicesOverview() {
             <ArrowRight className="size-4" aria-hidden />
           </ButtonLink>
           <p className="text-sm leading-relaxed text-muted">
-            {pricedServiceCount} of these ship as fixed-price packages you can order outright —{" "}
-            <Link href="/pricing" className="text-brand underline-offset-4 hover:underline">
+            Several of these ship as defined packages with a set deliverable and delivery
+            time —{" "}
+            <Link href="/packages" className="text-brand underline-offset-4 hover:underline">
               see the packages
             </Link>
-            . The rest are quoted after a scoping call.
+            . Everything is scoped and quoted after a call.
           </p>
         </div>
       </Container>

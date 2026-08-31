@@ -233,11 +233,10 @@ export default function ContactPage() {
                     <div>
                       <h2 className="text-sm font-semibold">First time working with us?</h2>
                       <p className="mt-2 text-sm leading-relaxed text-muted">
-                        Start with a fixed-price package rather than a build. Defined deliverable,
-                        defined price, invoiced on delivery — and a 30-day warranty on everything
-                        that ships.
+                        Start with a defined package rather than a full build. A set deliverable,
+                        a set delivery time, and a 30-day warranty on everything that ships.
                       </p>
-                      <ButtonLink href="/pricing" variant="secondary" size="sm" className="mt-4">
+                      <ButtonLink href="/packages" variant="secondary" size="sm" className="mt-4">
                         See the packages
                       </ButtonLink>
                     </div>
@@ -296,7 +295,7 @@ export default function ContactPage() {
                 align="left"
                 eyebrow="Common questions"
                 title="Answered before you ask"
-                description="The four we field most often. There are more on the pricing and process pages."
+                description="The four we field most often. There are more on the packages and process pages."
               />
               <dl className="mt-8 flex flex-col gap-6">
                 {shortlist.map((faq) => (

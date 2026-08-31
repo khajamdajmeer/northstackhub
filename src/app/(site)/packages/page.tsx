@@ -4,18 +4,15 @@ import {
   CalendarDays,
   Check,
   Clock,
-  Info,
   RefreshCcw,
   X,
 } from "lucide-react";
 
 import { siteConfig } from "@/config/site";
 import {
-  currencyNote,
   customEngagements,
   engagementNotes,
   packages,
-  lowestPackagePriceUsd,
   type ServicePackage,
 } from "@/content/pricing";
 import { faqs } from "@/content/company";
@@ -30,13 +27,7 @@ import { FaqAccordion } from "@/components/marketing/faq-accordion";
 import { Reveal } from "@/components/motion/reveal";
 import { cn } from "@/lib/utils";
 
-const inr = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 });
-
 const packageCount = packages.reduce((total, pkg) => total + pkg.tiers.length, 0);
-
-function fromPriceUsd(pkg: ServicePackage) {
-  return Math.min(...pkg.tiers.map((tier) => tier.priceUsd));
-}
 
 function deliveryRange(pkg: ServicePackage) {
   const days = pkg.tiers.map((tier) => tier.deliveryDays);
@@ -46,13 +37,15 @@ function deliveryRange(pkg: ServicePackage) {
 }
 
 export const metadata: Metadata = {
-  title: "Pricing & packages",
-  description: `Real fixed-price packages from $${lowestPackagePriceUsd} — RAG chatbots, full-stack web applications and deployment with CI/CD. Every price, delivery time and revision count is the one you will be quoted.`,
-  alternates: { canonical: "/pricing" },
+  title: "Packages",
+  description:
+    "Defined packages for RAG chatbots, full-stack web applications and deployment with CI/CD — each with a fixed deliverable, delivery time and revision count. Scoped and quoted after a call.",
+  alternates: { canonical: "/packages" },
   openGraph: {
-    title: `Pricing & packages | ${siteConfig.name}`,
-    description: `Real fixed-price packages from $${lowestPackagePriceUsd}. Larger builds are scoped and quoted after a call.`,
-    url: `${siteConfig.url}/pricing`,
+    title: `Packages | ${siteConfig.name}`,
+    description:
+      "Defined packages with a fixed deliverable, delivery time and revision count. Larger builds are scoped and quoted after a call.",
+    url: `${siteConfig.url}/packages`,
   },
 };
 
@@ -63,36 +56,6 @@ const faqSchema = {
     "@type": "Question",
     name: faq.q,
     acceptedAnswer: { "@type": "Answer", text: faq.a },
-  })),
-};
-
-/**
- * One Product per package, one Offer per tier. Prices and delivery times come
- * straight from the package data, so the markup cannot drift away from what the
- * page renders. Each offer points at its own anchor on this page.
- */
-const productSchema = {
-  "@context": "https://schema.org",
-  "@graph": packages.map((pkg) => ({
-    "@type": "Product",
-    name: pkg.title,
-    description: pkg.summary,
-    category: pkg.category,
-    brand: { "@type": "Brand", name: siteConfig.name },
-    offers: pkg.tiers.map((tier) => ({
-      "@type": "Offer",
-      name: `${pkg.title} — ${tier.name}`,
-      description: tier.description,
-      price: tier.priceUsd,
-      priceCurrency: "USD",
-      url: `${siteConfig.url}/pricing#${pkg.slug}`,
-      availability: "https://schema.org/InStock",
-      deliveryLeadTime: {
-        "@type": "QuantitativeValue",
-        value: tier.deliveryDays,
-        unitCode: "DAY",
-      },
-    })),
   })),
 };
 
@@ -130,26 +93,22 @@ export default function PricingPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
-      />
 
       <PageHero
-        eyebrow="Pricing"
+        eyebrow="Packages"
         title={
           <>
             The packages we <span className="text-gradient">actually sell</span>
           </>
         }
-        description={`${packages.length} services, ${packageCount} packages, starting at $${lowestPackagePriceUsd}. Each one has a defined deliverable, a delivery time and a revision count — the same numbers that go into your quote, because this page is built from them.`}
+        description={`${packages.length} services, ${packageCount} packages. Each one has a defined deliverable, a delivery time and a revision count, so you know exactly what arrives and when before anything is agreed.`}
       >
         <ButtonLink href="#packages" size="lg">
           Browse the packages
           <ArrowRight className="size-4" aria-hidden />
         </ButtonLink>
         <ButtonLink href="/contact" variant="secondary" size="lg">
-          Quote something larger
+          Scope something larger
           <ArrowRight className="size-4" aria-hidden />
         </ButtonLink>
       </PageHero>
@@ -158,15 +117,11 @@ export default function PricingPage() {
         <Container>
           <SectionHeading
             align="left"
-            eyebrow="Fixed-price packages"
-            title={`${packageCount} packages you can buy today`}
-            description="Pick the package that matches your scope and the delivery clock starts the day it is agreed. If your project is bigger than the largest package, skip to the custom section further down."
+            eyebrow="Defined packages"
+            title={`${packageCount} packages with a defined scope`}
+            description="Pick the package that matches your scope and the delivery clock starts the day it is agreed. If your project is bigger than the largest package, skip to the custom section further down — we scope it and put a number in writing within 24 hours."
           />
 
-          <div className="mt-10 flex flex-col gap-3 rounded-card border border-brand/30 bg-brand-soft p-5 sm:flex-row sm:items-start">
-            <Info className="mt-0.5 size-5 shrink-0 text-brand-strong" aria-hidden />
-            <p className="text-sm leading-relaxed text-brand-strong">{currencyNote}</p>
-          </div>
 
           <nav aria-label="Jump to a package" className="mt-8">
             <ul className="grid gap-px overflow-hidden rounded-card border border-border bg-border sm:grid-cols-3">
@@ -178,7 +133,7 @@ export default function PricingPage() {
                   >
                     <span className="text-sm font-semibold tracking-tight">{pkg.title}</span>
                     <span className="font-mono text-xs text-muted">
-                      from ${fromPriceUsd(pkg)} · {deliveryRange(pkg)}
+                      {pkg.tiers.length} tiers · {deliveryRange(pkg)}
                     </span>
                   </a>
                 </li>
@@ -209,17 +164,13 @@ export default function PricingPage() {
                   </h2>
                   <p className="text-base leading-relaxed text-muted text-pretty">{pkg.summary}</p>
 
-                  <dl className="grid grid-cols-3 gap-px overflow-hidden rounded-card border border-border bg-border">
-                    <div className="flex flex-col gap-1 bg-background p-4">
-                      <dt className="text-xs uppercase tracking-wide text-muted">From</dt>
-                      <dd className="text-base font-semibold sm:text-lg">${fromPriceUsd(pkg)}</dd>
-                    </div>
+                  <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-card border border-border bg-border">
                     <div className="flex flex-col gap-1 bg-background p-4">
                       <dt className="text-xs uppercase tracking-wide text-muted">Delivery</dt>
                       <dd className="text-base font-semibold sm:text-lg">{deliveryRange(pkg)}</dd>
                     </div>
                     <div className="flex flex-col gap-1 bg-background p-4">
-                      <dt className="text-xs uppercase tracking-wide text-muted">Packages</dt>
+                      <dt className="text-xs uppercase tracking-wide text-muted">Tiers</dt>
                       <dd className="text-base font-semibold sm:text-lg">{pkg.tiers.length}</dd>
                     </div>
                   </dl>
@@ -248,15 +199,6 @@ export default function PricingPage() {
                     ) : null}
 
                     <h3 className="text-lg font-semibold tracking-tight">{tier.name}</h3>
-
-                    <div className="mt-4 flex flex-col gap-0.5">
-                      <span className="text-4xl font-semibold tracking-tight">
-                        ${tier.priceUsd}
-                      </span>
-                      <span className="font-mono text-xs text-muted">
-                        ₹{inr.format(tier.priceInr)} on the pkg
-                      </span>
-                    </div>
 
                     <dl className="mt-5 grid grid-cols-2 gap-3 border-y border-border py-4 text-sm">
                       <div className="flex flex-col gap-1">

@@ -74,9 +74,9 @@ export const values = [
 
 export const differentiators = [
   {
-    title: "Fixed scope, fixed price",
+    title: "Fixed scope, one number",
     description:
-      "You approve a written scope and a number. Change requests are quoted separately, so the invoice at the end matches the one at the start.",
+      "You approve a written scope and a number before work starts. Change requests are agreed separately, so the invoice at the end matches the one at the start.",
   },
   {
     title: "Weekly working software",
@@ -149,6 +149,38 @@ export type Testimonial = {
  */
 export const testimonials: Testimonial[] = [];
 
+/**
+ * Companies whose work we have delivered on.
+ *
+ * Every entry must be a real engagement. Naming a company here is a public claim
+ * about them — a prospect can ring them to check it, and they can act on it if
+ * it is wrong. Same rule as `testimonials` above: an empty array renders
+ * nothing rather than tempting anyone to pad it.
+ *
+ * `logo` is optional. Where one is set it points at a file in /public/clients;
+ * where it is absent the strip sets the name as a wordmark instead, which reads
+ * better than a 32px favicon scaled up.
+ */
+export type Client = {
+  name: string;
+  /** Linked from the card, so the claim is checkable. */
+  url: string;
+  logo?: string;
+};
+
+export const clients: Client[] = [
+  { name: "Leverage Edu", url: "https://leverageedu.com", logo: "/clients/leverage-edu.png" },
+  { name: "GetYourGuide", url: "https://www.getyourguide.com" },
+  { name: "Viator", url: "https://www.viator.com" },
+  { name: "eWings", url: "https://ewings.co.in", logo: "/clients/ewings.png" },
+  { name: "WrittenlyHub", url: "https://www.writtenlyhub.com", logo: "/clients/writtenlyhub.png" },
+  { name: "GT Holidays", url: "https://www.gtholidays.in", logo: "/clients/gt-holidays.png" },
+  { name: "e-PGPathshala", url: "https://epgp.inflibnet.ac.in" },
+  { name: "Techcanvass", url: "https://techcanvass.com" },
+  { name: "Small Batch", url: "https://smallbatch.co.in" },
+  { name: "Shikhar", url: "https://www.shikhar.com" },
+];
+
 export const faqs = [
   {
     q: "How do we start working together?",
@@ -156,11 +188,11 @@ export const faqs = [
   },
   {
     q: "How do engagements usually start?",
-    a: "Most start small — a fixed-price package with a defined deliverable, so you can see how we work before committing to a build. Larger engagements run as a direct contract with milestone invoicing. The engineering is identical either way.",
+    a: "Most start small — a defined package with a set deliverable, so you can see how we work before committing to a build. Larger engagements run as a direct contract with milestone invoicing. The engineering is identical either way.",
   },
   {
-    q: "How do you price projects?",
-    a: "Fixed price against a fixed scope for defined projects, monthly retainer for ongoing work, and a day rate only for open-ended discovery or audits. You always approve a number before work starts.",
+    q: "How is the cost agreed?",
+    a: "A fixed number against a fixed scope for defined projects, a monthly retainer for ongoing work, and a day rate only for open-ended discovery or audits. Nothing is published — you get a written scope and a number after a call, and you approve it before anything is built.",
   },
   {
     q: "What if the scope changes mid-project?",
@@ -176,7 +208,7 @@ export const faqs = [
   },
   {
     q: "Which time zones do you cover?",
-    a: "We are remote-first and work GMT+5:30, with a daily overlap window for US and European clients. Written updates land every day regardless of overlap, and urgent production issues are covered outside those hours on Priority support.",
+    a: "We work from New Jersey and Hyderabad, so the day is covered across US Eastern and Indian hours with a wide live overlap for European clients too. Written updates land every day regardless, and urgent production issues are covered outside those hours on Priority support.",
   },
   {
     q: "Can you join an existing team?",

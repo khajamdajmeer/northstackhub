@@ -245,8 +245,7 @@ export default function AboutPage() {
                             {service.short}
                           </p>
                           <p className="mt-3 text-sm text-brand-strong">
-                            {service.startingAt ? `From ${service.startingAt}` : "Quoted per project"}{" "}
-                            · {service.timeline}
+                            Scoped per project · {service.timeline}
                           </p>
                         </div>
                       </Link>
@@ -402,7 +401,7 @@ export default function AboutPage() {
           </div>
 
           <p className="mt-8 max-w-3xl text-sm leading-relaxed text-muted">
-            Smaller projects run as a single fixed-price package, invoiced on delivery — enough to
+            Smaller projects run as a single defined package, invoiced on delivery — enough to
             see how we work without committing to a build. Once there is a working relationship,
             most clients move to a direct contract with milestone invoicing. You can start on
             either side and move later.
@@ -414,7 +413,7 @@ export default function AboutPage() {
               <CalendarDays className="size-4" aria-hidden />
               Book a call
             </ButtonLink>
-            <ButtonLink href="/pricing" variant="outline">
+            <ButtonLink href="/packages" variant="outline">
               See the packages
             </ButtonLink>
           </div>
