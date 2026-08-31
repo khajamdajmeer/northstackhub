@@ -23,6 +23,21 @@ import { formatDate, pdfColors, registerPdfFonts } from "../theme";
  * Provenance comes from the reference and the verification line instead.
  */
 
+/**
+ * The frame's palette.
+ *
+ * Light by default: a certificate is printed, framed and photocopied, and a
+ * near-black ground bleeding to the paper edge is both a poor photocopy and a
+ * lot of toner. These are the site's light-theme tokens warmed slightly, so the
+ * amber still reads as the brand rather than as beige.
+ */
+const frame = {
+  ground: "#f7f3ec",
+  wedge: "#f7d9a1",
+  wedgeEdge: "#eec27a",
+  mesh: "#d9a441",
+} as const;
+
 // A4 landscape, in points.
 const PAGE_W = 841.89;
 const PAGE_H = 595.28;
@@ -38,7 +53,7 @@ const styles = StyleSheet.create({
     fontFamily: "NotoSans",
     fontSize: 11,
     color: pdfColors.body,
-    backgroundColor: pdfColors.ink,
+    backgroundColor: frame.ground,
     padding: 0,
   },
 
@@ -50,6 +65,10 @@ const styles = StyleSheet.create({
     width: CARD_W,
     height: CARD_H,
     backgroundColor: "#ffffff",
+    // A hairline, because white on warm off-white is not enough of a step to
+    // read as a card on its own.
+    borderWidth: 0.75,
+    borderColor: pdfColors.hairline,
     paddingTop: 44,
     paddingBottom: 30,
     paddingHorizontal: 54,
@@ -63,7 +82,7 @@ const styles = StyleSheet.create({
     left: -190,
     width: 420,
     height: PAGE_H + 280,
-    backgroundColor: pdfColors.brand,
+    backgroundColor: frame.wedge,
     transform: "rotate(-10deg)",
   },
   wedgeEdge: {
@@ -72,12 +91,12 @@ const styles = StyleSheet.create({
     left: 230,
     width: 26,
     height: PAGE_H + 280,
-    backgroundColor: pdfColors.brandDeep,
+    backgroundColor: frame.wedgeEdge,
     transform: "rotate(-10deg)",
   },
   mesh: { position: "absolute", height: 0.7 },
-  meshWarm: { backgroundColor: pdfColors.brandDeep, opacity: 0.5 },
-  meshCool: { backgroundColor: pdfColors.brand, opacity: 0.35 },
+  meshWarm: { backgroundColor: frame.mesh, opacity: 0.55 },
+  meshCool: { backgroundColor: frame.mesh, opacity: 0.4 },
 
   // Over the card's top-right corner, where the template puts its medal.
   badge: {

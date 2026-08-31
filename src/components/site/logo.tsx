@@ -14,6 +14,15 @@ import { siteConfig } from "@/config/site";
  * The full drawing exists at `/public/brand/mark.svg` and is used where it is
  * rendered large — the OG image and the PDF documents. At the 28px the header
  * uses, the full version's traces collapse into noise.
+ *
+ * Light and dark are the two supplied cuts of the artwork:
+ *  - light: the tiled mark, whose dark tile gives the off-white "N" something
+ *    to sit on
+ *  - dark: the untiled ("plain") mark, sitting straight on the page
+ *
+ * Switched with a CSS variant rather than `useTheme()`, so the correct mark is
+ * in the first HTML the browser receives — reading the theme in JavaScript
+ * means rendering the wrong one until hydration and flashing on every load.
  */
 export function LogoMark({ className }: { className?: string }) {
   return (
@@ -24,7 +33,11 @@ export function LogoMark({ className }: { className?: string }) {
       aria-hidden
       focusable="false"
     >
-      <rect width="64" height="64" rx="16" fill="#0C0D0E" />
+      {/* The tile is what makes the mark legible on a light page. On a dark
+          one it would be a black square on a near-black ground, so it is
+          dropped and the drawing sits directly on the background — which is
+          exactly the supplied "plain" variant. */}
+      <rect width="64" height="64" rx="16" fill="#0C0D0E" className="dark:hidden" />
       <path
         d="M32 11 L53 32 L32 53 L11 32 Z"
         fill="none"

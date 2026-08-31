@@ -149,6 +149,15 @@ Two rules worth knowing before you reuse them:
   paints with the first byte of HTML rather than costing a request, and at 28px
   the full drawing's traces collapse into noise. The full artwork is used where
   it renders large: the OG card and the PDFs.
+- **Light and dark use different cuts.** Light gets the tiled mark, whose dark
+  tile gives the off-white "N" something to sit on; dark gets the untiled
+  "plain" mark, sitting straight on the page. Switched by hiding the tile with
+  a `dark:` variant rather than reading the theme in JavaScript, so the right
+  mark is in the first HTML the browser sees and there is no flash on load.
+- **Documents are light by default.** The certificate frame, the letterheads
+  and the payslip all sit on a light ground and use the tiled mark. A
+  certificate is printed, framed and photocopied, and a near-black ground
+  bleeding to the paper edge is a poor photocopy and a lot of toner.
 - **The PDFs use the PNG, not the SVG.** react-pdf implements only a subset of
   SVG, and the mark is several hundred stroked paths behind a radial gradient.
   `src/lib/pdf/elements.tsx` reads the 1024px raster off disk, so a document
