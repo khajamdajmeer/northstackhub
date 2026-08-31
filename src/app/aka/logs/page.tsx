@@ -20,7 +20,18 @@ const ACTION_LABELS: Record<string, string> = {
   "submission.status_changed": "Status changed",
   "submission.notes_updated": "Notes updated",
   "submission.deleted": "Enquiry deleted",
+  "hr_document.created": "Document generated",
+  "hr_document.status_changed": "Document status changed",
+  "hr_document.deleted": "Document deleted",
 };
+
+/** Where a logged action's target lives, or null if it is not linkable. */
+function targetHref(targetType: string | null, targetId: string | null): string | null {
+  if (!targetId) return null;
+  if (targetType === "contact_submission") return `/aka/submissions/${targetId}`;
+  if (targetType === "hr_document") return `/aka/documents/${targetId}`;
+  return null;
+}
 
 function formatDate(value: string) {
   return new Date(value).toLocaleString("en-GB", {
@@ -101,12 +112,12 @@ export default async function LogsPage({
                     </td>
                     <td className="px-4 py-3 align-top text-muted">{row.actor}</td>
                     <td className="px-4 py-3 align-top">
-                      {row.target_type === "contact_submission" && row.target_id ? (
+                      {targetHref(row.target_type, row.target_id) ? (
                         <Link
-                          href={`/aka/submissions/${row.target_id}`}
+                          href={targetHref(row.target_type, row.target_id)!}
                           className="font-mono text-xs text-brand underline-offset-4 hover:underline"
                         >
-                          {row.target_id.slice(0, 8)}
+                          {row.target_id!.slice(0, 8)}
                         </Link>
                       ) : (
                         <span className="text-muted">—</span>

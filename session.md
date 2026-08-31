@@ -503,3 +503,81 @@ collision.
   deliberately not invented.
 - Worth eyeballing the hero strip at a ~640px viewport once deployed; the
   character budget says it fits, but that was reasoned, not seen.
+
+---
+
+## Session: 2026-08-31 — HR document generator
+
+Branch: `feat/hr-documents`.
+
+### Current objective
+
+A section of the console for generating internship certificates, payslips,
+offer letters and increment letters as PDFs, with the salary maths derived
+automatically, every record stored, and a dashboard over the lot.
+
+### Completed work
+
+**Four PDF templates** built with `@react-pdf/renderer`, per the branding rules:
+internship certificate is landscape with an amber spine and the logo, and no
+watermark; payslip carries the logo in the letterhead only; offer and increment
+letters carry the diagonal logo watermark.
+
+**Payroll calculator** in `src/lib/admin/hr/payroll.ts` — pure functions with no
+server dependency, so the live preview in the form and the PDF template call the
+same code and cannot disagree. Every rate sits in `hr/config.ts`.
+
+**Schema**: `employees` (upserted by email, so a person's documents collect under
+one row), `hr_documents` (jsonb payload per type, denormalised name and date at
+issue time) and `hr_document_counters` behind a `next_hr_reference()` function
+that allocates `NSH/CERT/2026/0007`-style references under a row lock.
+
+**Routes**: `/aka/documents` (list, type filters, search, counters),
+`/aka/documents/new` (type picker then the form), `/aka/documents/[id]` (detail,
+status, delete) and `/aka/documents/[id]/pdf` (download). Every action and the
+PDF route re-check the session independently.
+
+**`npm run docs:preview`** renders one of each from fictional sample data
+without a database — how the templates were verified, and how to iterate on the
+designs.
+
+### Decisions made
+
+- **PF is computed on the full basic, not the ₹15,000 statutory ceiling.** The
+  approved preview showed ₹3,000 on a ₹25,000 basic; the first implementation
+  applied the ceiling and produced ₹1,800, which the tests caught. Config now
+  defaults to no ceiling, with `pfWageCeiling: 15000` documented as the
+  statutory alternative.
+- **Noto Sans is bundled in `public/fonts/`.** The standard 14 PDF fonts use
+  WinAnsi encoding, which has no ₹ (U+20B9) — Helvetica prints a blank box on
+  every payslip. Verified the glyph is present in both faces before committing.
+- **jsonb per document rather than four column sets.** The types share almost
+  nothing, and an issued document must render as it was issued even after the
+  form gains or loses a field.
+
+### Bugs found by verification
+
+- **Label/basis overlap in all three tabular documents.** `flex: 1` on a Text
+  stacked above another inside a column made them render on top of each other.
+  Only visible by looking at the rendered PDF.
+- **`fontStyle: "italic"` on the payslip** threw "Could not resolve font" —
+  react-pdf does not fall back when a style has no registered face.
+
+### Blocked / needs the owner
+
+- **The schema is not applied.** This network lost IPv6 egress mid-session and
+  Supabase's direct host is IPv6-only, so `npm run db:push` cannot connect from
+  here. `supabase/schema.sql` is committed and idempotent — run it in the
+  Supabase SQL editor, or `npm run db:push` from a network with IPv6.
+  **Nothing under `/aka/documents` works until it is applied.**
+- **`companyDetails` and `signatory` are placeholders.** Registered address, CIN
+  and the signing name and designation must be confirmed before any document is
+  issued to a real person.
+
+### Verification
+
+`npm run lint` clean · `npx tsc --noEmit` clean · `npm test` 36/36 (15 auth,
+21 payroll) · `npm run build` succeeds, 12 admin routes. All four PDFs rendered
+and inspected as images: ₹ glyph correct, watermark on the two letters and not
+on the payslip, figures matching the approved breakdown exactly
+(₹50,000 gross → ₹46,800 net).

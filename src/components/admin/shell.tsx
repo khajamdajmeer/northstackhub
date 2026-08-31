@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { Inbox, LogOut, ScrollText } from "lucide-react";
+import { FileText, Inbox, LogOut, ScrollText } from "lucide-react";
 
 import { LogoMark } from "@/components/site/logo";
 import { signOut } from "@/app/aka/login/actions";
 
 const nav = [
   { href: "/aka", label: "Enquiries", icon: Inbox },
+  { href: "/aka/documents", label: "Documents", icon: FileText },
   { href: "/aka/logs", label: "Activity log", icon: ScrollText },
 ];
 

@@ -63,6 +63,7 @@ src/
       login/                sign-in page and its server actions
       page.tsx              enquiry list, filters, search, counters
       submissions/[slug]/   one enquiry: status, notes, activity trail
+      documents/            HR documents: list, new, detail, /pdf download
       logs/                 admin audit log
       actions.ts            status/notes/delete server actions
     api/contact/route.ts    contact form handler
@@ -79,10 +80,15 @@ src/
   config/site.ts            company facts, navigation, social links, principles
   lib/
     admin/                  auth, DAL, queries, status model
+      hr/                   payroll maths, document schemas, employee queries
+    pdf/                    react-pdf templates, shared theme and watermark
     supabase.ts             server-side client (secret key, never bundled)
     ...                     utils, motion timing, contact schema
+public/fonts/               Noto Sans, bundled for the ₹ glyph in PDFs
 supabase/schema.sql         tables, indexes, trigger and RLS for the console
 scripts/hash-password.mjs   generates ADMIN_PASSWORD_HASH + ADMIN_SESSION_SECRET
+scripts/*.test.mts          auth and payroll assertions (npm test)
+scripts/preview-documents.mjs  renders sample PDFs without a database
 ```
 
 ## Editing content
@@ -247,12 +253,52 @@ Functions cannot dial. All runtime access goes over PostgREST via HTTPS
 instead, which also removes any connection-pooling concern. The direct URL is
 used only from a developer machine, by `npm run db:push`.
 
+### HR documents
+
+`/aka/documents` generates four document types as real PDFs, stores each one,
+and lets you re-download it later:
+
+| Type | Reference | Branding |
+| --- | --- | --- |
+| Internship certificate | `NSH/CERT/…` | Landscape, amber spine, logo — no watermark |
+| Payslip | `NSH/PAY/…` | Logo in the letterhead only |
+| Offer letter | `NSH/OFR/…` | Diagonal logo watermark |
+| Increment letter | `NSH/INC/…` | Diagonal logo watermark |
+
+References are allocated by `next_hr_reference()` in Postgres — a per-type,
+per-year counter behind a row lock, so two admins generating at the same moment
+cannot be handed the same number.
+
+**Salary maths** lives in `src/lib/admin/hr/payroll.ts` as pure functions, called
+by both the live preview in the form and the PDF template, so the figures on
+screen and the figures printed cannot diverge. Every rate is in
+`src/lib/admin/hr/config.ts`:
+
+- Basic 50% of gross · HRA 40% of basic (Hyderabad is non-metro for HRA)
+- Special allowance absorbs the remainder, so components always sum to the gross
+- Employee PF 12% of basic, on the **full** basic — set `pfWageCeiling` to
+  `15000` to apply the statutory EPF cap instead
+- Professional tax on the Telangana slabs (₹200 above ₹20,000/month)
+
+Run `npm run test:payroll` after changing any of it; the tests assert that
+earnings always sum to the entered gross and that nothing can go negative.
+
+`companyDetails` and `signatory` in the same file carry **placeholder** legal
+details — confirm the registered address, CIN and signing name before issuing
+anything to a real employee.
+
+```bash
+npm run docs:preview   # renders one of each to .preview/, no database needed
+```
+
 ### Data protection
 
 Every table has RLS enabled with no policy attached, and `anon` /
 `authenticated` are revoked outright. Only the secret key reaches the data —
 verified: a request with the publishable key is refused with `42501 permission
-denied` on all three tables.
+denied`. This matters more for `employees` and `hr_documents` than for
+enquiries, since those hold salary figures and home addresses. The PDF route
+checks the session itself and sends `Cache-Control: private, no-store`.
 
 ## SEO
 

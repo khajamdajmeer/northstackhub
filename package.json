@@ -9,10 +9,14 @@
     "lint": "eslint",
     "admin:hash": "node scripts/hash-password.mjs",
     "db:push": "psql \"$SUPABASE_DB_URL\" -v ON_ERROR_STOP=1 -f supabase/schema.sql",
-    "test:auth": "node --conditions=react-server --experimental-strip-types --no-warnings scripts/auth.test.mts"
+    "test:auth": "node --import ./scripts/test-setup.mjs --conditions=react-server --experimental-strip-types --no-warnings scripts/auth.test.mts",
+    "test:payroll": "node --import ./scripts/test-setup.mjs --conditions=react-server --experimental-strip-types --no-warnings scripts/payroll.test.mts",
+    "test": "npm run test:auth && npm run test:payroll",
+    "docs:preview": "node scripts/preview-documents.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
+    "@react-pdf/renderer": "^4.9.0",
     "@react-three/drei": "^10.7.8",
     "@react-three/fiber": "^9.7.0",
     "@supabase/supabase-js": "^2.112.4",
@@ -38,6 +42,7 @@
     "@types/three": "^0.182.0",
     "eslint": "^9",
     "eslint-config-next": "16.3.1",
+    "jiti": "^2.7.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
