@@ -59,3 +59,22 @@ export function requireSupabase(): SupabaseClient {
 export function isSupabaseConfigured(): boolean {
   return Boolean(process.env.SUPABASE_URL && process.env.SUPABASE_SECRET_KEY);
 }
+
+/**
+ * True when the failure is "this table does not exist" rather than a real
+ * error.
+ *
+ * Connected-but-unmigrated is a normal state on a fresh environment, and it
+ * should show the operator how to fix it rather than a 500. PostgREST reports
+ * it as PGRST205 with a "schema cache" message; the text is matched too because
+ * the code is not always carried through the client's error shape.
+ */
+export function isMissingTableError(error: unknown): boolean {
+  if (!error) return false;
+
+  const code = (error as { code?: string }).code;
+  if (code === "PGRST205" || code === "42P01") return true;
+
+  const message = error instanceof Error ? error.message : String(error);
+  return /schema cache|does not exist|Could not find the table/i.test(message);
+}

@@ -4,7 +4,7 @@ import { Database, FileText, Plus, Search } from "lucide-react";
 
 import { AdminShell } from "@/components/admin/shell";
 import { requireSession } from "@/lib/admin/dal";
-import { isSupabaseConfigured } from "@/lib/supabase";
+import { isMissingTableError, isSupabaseConfigured } from "@/lib/supabase";
 import { getDocumentStats, listDocuments } from "@/lib/admin/hr/data";
 import {
   DOCUMENT_META,
@@ -26,6 +26,34 @@ function formatDate(value: string) {
     month: "short",
     year: "numeric",
   });
+}
+
+/**
+ * Shown when Supabase is reachable but `supabase/schema.sql` has not been run —
+ * the tables for this section do not exist yet.
+ */
+function SchemaNotice() {
+  return (
+    <div className="flex flex-col items-start gap-4 rounded-card border border-brand/30 bg-brand-soft p-6">
+      <Database className="size-5 text-brand-strong" aria-hidden />
+      <h2 className="text-base font-semibold text-brand-strong">
+        Document tables not created yet
+      </h2>
+      <p className="max-w-2xl text-sm leading-relaxed text-brand-strong">
+        Supabase is connected, but this section&rsquo;s tables do not exist. Run{" "}
+        <code className="font-mono text-xs">supabase/schema.sql</code> against the
+        database — paste it into the Supabase SQL editor, or from a machine that can
+        reach the database directly:
+      </p>
+      <pre className="w-full overflow-x-auto rounded-xl bg-background/60 p-4 font-mono text-xs text-brand-strong">
+        SUPABASE_DB_URL=&apos;postgresql://…&apos; npm run db:push
+      </pre>
+      <p className="max-w-2xl text-xs leading-relaxed text-brand-strong">
+        The file is safe to run more than once — every statement is guarded, so it
+        will not disturb the enquiry tables that already exist.
+      </p>
+    </div>
+  );
 }
 
 export default async function DocumentsPage({
@@ -57,10 +85,26 @@ export default async function DocumentsPage({
   const query = params.q ?? "";
   const page = Math.max(1, Number(params.page) || 1);
 
-  const [stats, { rows, total }] = await Promise.all([
-    getDocumentStats(),
-    listDocuments({ type, status, query, page, perPage: PER_PAGE }),
-  ]);
+  // Connected but unmigrated is a normal state on a fresh environment, and it
+  // has a specific fix. Showing it as a 500 sends the operator hunting through
+  // logs for something that is one SQL file away.
+  let stats: Awaited<ReturnType<typeof getDocumentStats>>;
+  let rows: Awaited<ReturnType<typeof listDocuments>>["rows"];
+  let total: number;
+
+  try {
+    [stats, { rows, total }] = await Promise.all([
+      getDocumentStats(),
+      listDocuments({ type, status, query, page, perPage: PER_PAGE }),
+    ]);
+  } catch (error) {
+    if (!isMissingTableError(error)) throw error;
+    return (
+      <AdminShell email={session.email} current="/aka/documents">
+        <SchemaNotice />
+      </AdminShell>
+    );
+  }
 
   const pageCount = Math.max(1, Math.ceil(total / PER_PAGE));
 
