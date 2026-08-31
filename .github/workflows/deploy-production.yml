@@ -83,7 +83,10 @@ jobs:
 
           check /         "200"          '[ "$code" = "200" ]'
           check /contact  "200"          '[ "$code" = "200" ]'
-          check /pricing  "200"          '[ "$code" = "200" ]'
+          check /packages "200"          '[ "$code" = "200" ]'
+          # /pricing moved to /packages when published prices came off. Asserted
+          # so the redirect cannot be dropped without this failing.
+          check /pricing  "a 3xx redirect" 'case "$code" in 30*) true ;; *) false ;; esac'
           # The console must never render for a signed-out visitor.
           check /aka      "a 3xx redirect" 'case "$code" in 30*) true ;; *) false ;; esac'
 
