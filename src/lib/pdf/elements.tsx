@@ -1,57 +1,42 @@
-import {
-  Defs,
-  LinearGradient,
-  Path,
-  Rect,
-  Stop,
-  StyleSheet,
-  Svg,
-  Text,
-  View,
-} from "@react-pdf/renderer";
+import path from "node:path";
+import { Image, StyleSheet, Text, View } from "@react-pdf/renderer";
 
 import { companyDetails, signatory } from "@/lib/admin/hr/config";
 import { base, pdfColors } from "./theme";
 
 /**
  * Shared furniture: the mark, the letterhead, the diagonal watermark and the
- * signature block. Drawn as vectors rather than embedded images so the
- * documents stay small and print sharp at any size.
+ * signature block.
  */
 
 /**
- * The NorthStackHub mark — the same amber tile and north star as
- * `src/components/site/logo.tsx`, redrawn with react-pdf primitives.
+ * The real NorthStackHub artwork, from `public/brand`.
  *
- * `flat` drops the gradient for the watermark, where a gradient at 4% opacity
- * only muddies the shape.
+ * A raster rather than the source SVG: react-pdf's Svg support covers only a
+ * subset of the spec, and the mark is several hundred stroked paths with a
+ * radial-gradient glow. The 1024px source is far above anything printed here —
+ * the largest use is the certificate badge at 52pt — so it stays sharp.
+ *
+ * Read from the filesystem so a document never depends on a network fetch.
  */
-export function LogoMark({ size = 28, flat }: { size?: number; flat?: string }) {
-  const radius = size * 0.25;
-  return (
-    <Svg width={size} height={size} viewBox="0 0 32 32">
-      {!flat && (
-        <Defs>
-          <LinearGradient id="nshMark" x1="0" y1="0" x2="32" y2="32">
-            <Stop offset="0" stopColor="#f5a524" />
-            <Stop offset="1" stopColor="#c77b12" />
-          </LinearGradient>
-        </Defs>
-      )}
-      <Rect
-        x="0"
-        y="0"
-        width="32"
-        height="32"
-        rx={(radius / size) * 32}
-        fill={flat ?? "url(#nshMark)"}
-      />
-      <Path
-        d="M16 6.5l2.4 5.4 5.6 1-4 4.1.9 5.9-4.9-2.8-4.9 2.8.9-5.9-4-4.1 5.6-1L16 6.5z"
-        fill={flat ? "#ffffff" : "#08090b"}
-      />
-    </Svg>
-  );
+const BRAND_DIR = path.join(process.cwd(), "public", "brand");
+const MARK = path.join(BRAND_DIR, "mark@1024.png");
+/** The same artwork without its dark tile, for use over a light page. */
+const MARK_PLAIN = path.join(BRAND_DIR, "mark-plain@1024.png");
+
+export function LogoMark({
+  size = 28,
+  opacity,
+  plain,
+}: {
+  size?: number;
+  opacity?: number;
+  plain?: boolean;
+}) {
+  // react-pdf's Image is not an HTML img and takes no alt prop — PDF alt text
+  // is set on the Document, not per element — so the a11y rule cannot apply.
+  // eslint-disable-next-line jsx-a11y/alt-text
+  return <Image src={plain ? MARK_PLAIN : MARK} style={{ width: size, height: size, opacity }} />;
 }
 
 const styles = StyleSheet.create({
@@ -148,7 +133,7 @@ export function Watermark() {
   return (
     <View style={styles.watermarkLayer} fixed>
       <View style={styles.watermarkInner}>
-        <LogoMark size={210} flat={pdfColors.watermark} />
+        <LogoMark size={210} opacity={0.07} plain />
         <Text style={styles.watermarkWord}>NORTHSTACKHUB</Text>
       </View>
     </View>

@@ -1,14 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
-  <rect width="32" height="32" rx="8" fill="url(#nsh-favicon)" />
-  <path
-    d="M16 6.5l2.4 5.4 5.6 1-4 4.1.9 5.9-4.9-2.8-4.9 2.8.9-5.9-4-4.1 5.6-1L16 6.5z"
-    fill="#08090b"
-    fill-opacity="0.92"
-  />
-  <defs>
-    <linearGradient id="nsh-favicon" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#f5a524" />
-      <stop offset="1" stop-color="#c77b12" />
-    </linearGradient>
-  </defs>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="NorthStackHub">
+  <rect width="64" height="64" rx="16" fill="#0C0D0E"/>
+  <path d="M32 11 L53 32 L32 53 L11 32 Z" fill="none" stroke="#EA9E22" stroke-width="4.5" stroke-linejoin="round"/>
+  <circle cx="32" cy="5.5" r="3.2" fill="#F5B44A"/>
+  <circle cx="58.5" cy="32" r="3.2" fill="#EA9E22"/>
+  <circle cx="32" cy="58.5" r="3.2" fill="#F5B44A"/>
+  <circle cx="5.5" cy="32" r="3.2" fill="#EA9E22"/>
+  <g fill="#F0F1F3"><path d="M995 0 381 1085Q399 927 399 831V0H137V1409H474L1097 315Q1079 466 1079 590V1409H1341V0Z" transform="translate(21.17 43.32) scale(0.01465 -0.01465)"/></g>
 </svg>

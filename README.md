@@ -51,7 +51,7 @@ src/
                             `middleware` to `proxy`)
   app/
     layout.tsx              document shell: fonts, theme, site-wide metadata
-    icon.svg  apple-icon.tsx  favicon and iOS icon, from the NorthStackHub mark
+    icon.svg  apple-icon.png  favicon and iOS icon, from public/brand
     (site)/                 the public marketing site
       layout.tsx            header, footer, page transitions, JSON-LD
       page.tsx              home
@@ -84,6 +84,7 @@ src/
     pdf/                    react-pdf templates, shared theme and watermark
     supabase.ts             server-side client (secret key, never bundled)
     ...                     utils, motion timing, contact schema
+public/brand/               the NorthStackHub artwork — see Brand assets below
 public/fonts/               Noto Sans, bundled for the ₹ glyph in PDFs
 supabase/schema.sql         tables, indexes, trigger and RLS for the console
 scripts/hash-password.mjs   generates ADMIN_PASSWORD_HASH + ADMIN_SESSION_SECRET
@@ -128,6 +129,31 @@ The site deliberately carries no invented facts. Three rules hold it that way:
 > **Still to confirm before launch:** the Upwork, GitHub and LinkedIn links in
 > `siteConfig.links` — all still placeholders. Have `/privacy` and `/terms`
 > reviewed by a lawyer.
+
+## Brand assets
+
+The supplied artwork lives in `public/brand/`:
+
+| File | Use |
+| --- | --- |
+| `mark.svg` · `mark@1024.png` | The mark on its dark tile. Letterheads, OG card, certificate badge |
+| `mark-plain.svg` · `mark-plain@1024.png` | Same mark, no tile. The letter watermark, and anything over a light ground |
+| `mark-amber.svg` | Single-colour cut, for one-colour printing |
+| `lockup-dark.svg` · `lockup-light.svg` | Mark plus wordmark, for slides and email signatures |
+
+Two rules worth knowing before you reuse them:
+
+- **The header mark is inlined, not loaded.** `LogoMark` in
+  `src/components/site/logo.tsx` carries a simplified cut of the drawing — four
+  trace nodes rather than forty. It is above the fold on every page, so it
+  paints with the first byte of HTML rather than costing a request, and at 28px
+  the full drawing's traces collapse into noise. The full artwork is used where
+  it renders large: the OG card and the PDFs.
+- **The PDFs use the PNG, not the SVG.** react-pdf implements only a subset of
+  SVG, and the mark is several hundred stroked paths behind a radial gradient.
+  `src/lib/pdf/elements.tsx` reads the 1024px raster off disk, so a document
+  never depends on a network fetch. Use the **plain** variant over a light page —
+  the tiled one at watermark opacity reads as a grey square, not a logo.
 
 ## Design system — Ink & Amber
 

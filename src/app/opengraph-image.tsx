@@ -1,3 +1,5 @@
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { ImageResponse } from "next/og";
 import { siteConfig } from "@/config/site";
 
@@ -5,7 +7,12 @@ export const alt = `${siteConfig.name} — ${siteConfig.tagline}`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default function OpengraphImage() {
+export default async function OpengraphImage() {
+  // Inlined as a data URI: the renderer has no origin to resolve "/brand/..."
+  // against at build time, and a relative src silently renders nothing.
+  const mark = await readFile(path.join(process.cwd(), "public", "brand", "mark@1024.png"));
+  const markSrc = `data:image/png;base64,${mark.toString("base64")}`;
+
   return new ImageResponse(
     (
       <div
@@ -24,22 +31,7 @@ export default function OpengraphImage() {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-          <div
-            style={{
-              width: 56,
-              height: 56,
-              borderRadius: 16,
-              background: "linear-gradient(135deg, #f5a524, #c77b12)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            {/* Drawn rather than typed: a ★ glyph forces a dynamic font fetch at build time. */}
-            <svg width="30" height="30" viewBox="0 0 24 24" fill="#08090b">
-              <path d="M12 2l2.9 6.5 7 1.2-5 5 1.2 7L12 18.4 5.9 21.7l1.2-7-5-5 7-1.2L12 2z" />
-            </svg>
-          </div>
+          <img src={markSrc} width={56} height={56} alt="" style={{ borderRadius: 16 }} />
           <div style={{ fontSize: 32, fontWeight: 600, letterSpacing: -0.5 }}>
             NorthStackHub
           </div>
