@@ -10,7 +10,8 @@ export const contentType = "image/png";
 export default async function OpengraphImage() {
   // Inlined as a data URI: the renderer has no origin to resolve "/brand/..."
   // against at build time, and a relative src silently renders nothing.
-  const mark = await readFile(path.join(process.cwd(), "public", "brand", "mark@1024.png"));
+  const mark = await readFile(// The card is drawn on #08090b, so it takes the dark cut.
+    path.join(process.cwd(), "public", "brand", "mark-dark@1024.png"));
   const markSrc = `data:image/png;base64,${mark.toString("base64")}`;
 
   return new ImageResponse(

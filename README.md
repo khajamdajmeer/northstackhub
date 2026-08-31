@@ -136,24 +136,21 @@ The supplied artwork lives in `public/brand/`:
 
 | File | Use |
 | --- | --- |
-| `mark.svg` · `mark@1024.png` | The mark on its dark tile. Letterheads, OG card, certificate badge |
-| `mark-plain.svg` · `mark-plain@1024.png` | Same mark, no tile. The letter watermark, and anything over a light ground |
+| `mark-light.svg` · `mark-light@1024.png` | Off-white tile, darkened traces. Anything on a light ground — nav in light mode, every PDF |
+| `mark-dark.svg` · `mark-dark@1024.png` | Near-black tile, lighter traces. Anything on a dark ground — nav in dark mode, the OG card |
+| `mark.svg` · `mark@1024.png` | The original two-tone cut, kept for reference |
+| `mark-plain.svg` · `mark-plain@1024.png` | No tile at all. The letter watermark |
 | `mark-amber.svg` | Single-colour cut, for one-colour printing |
 | `lockup-dark.svg` · `lockup-light.svg` | Mark plus wordmark, for slides and email signatures |
 
 Two rules worth knowing before you reuse them:
 
-- **The header mark is inlined, not loaded.** `LogoMark` in
-  `src/components/site/logo.tsx` carries a simplified cut of the drawing — four
-  trace nodes rather than forty. It is above the fold on every page, so it
-  paints with the first byte of HTML rather than costing a request, and at 28px
-  the full drawing's traces collapse into noise. The full artwork is used where
-  it renders large: the OG card and the PDFs.
-- **Light and dark use different cuts.** Light gets the tiled mark, whose dark
-  tile gives the off-white "N" something to sit on; dark gets the untiled
-  "plain" mark, sitting straight on the page. Switched by hiding the tile with
-  a `dark:` variant rather than reading the theme in JavaScript, so the right
-  mark is in the first HTML the browser sees and there is no flash on load.
+- **Light and dark are two different drawings, not one recoloured.** Each has a
+  tile matching the ground it sits on, so the mark reads as artwork rather than
+  a badge stuck on the background. `LogoMark` renders both and hides one with a
+  `dark:` variant rather than choosing a src with `useTheme()` — JavaScript
+  cannot know the theme until hydration, so that would paint the wrong mark
+  first and flash on every load.
 - **Documents are light by default.** The certificate frame, the letterheads
   and the payslip all sit on a light ground and use the tiled mark. A
   certificate is printed, framed and photocopied, and a near-black ground

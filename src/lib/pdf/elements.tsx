@@ -20,8 +20,13 @@ import { base, pdfColors } from "./theme";
  * Read from the filesystem so a document never depends on a network fetch.
  */
 const BRAND_DIR = path.join(process.cwd(), "public", "brand");
-const MARK = path.join(BRAND_DIR, "mark@1024.png");
-/** The same artwork without its dark tile, for use over a light page. */
+/** Every document sits on a light ground, so they all take the light cut. */
+const MARK = path.join(BRAND_DIR, "mark-light@1024.png");
+/**
+ * The tile-less cut, for the watermark. The light variant's own tile is
+ * off-white and would vanish at watermark opacity anyway, but this keeps the
+ * faint traces even across the page rather than boxed.
+ */
 const MARK_PLAIN = path.join(BRAND_DIR, "mark-plain@1024.png");
 
 export function LogoMark({
