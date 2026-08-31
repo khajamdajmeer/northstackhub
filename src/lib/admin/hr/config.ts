@@ -26,13 +26,25 @@ export const companyDetails = {
 } as const;
 
 /**
- * Who signs. Appears above the signature rule on letters and certificates.
+ * Who signs the letters — offer and increment.
  * PLACEHOLDER — confirm the name and designation before issuing.
  */
 export const signatory = {
   name: "Ajmeer Khaja",
   designation: "Founder",
   place: "Hyderabad",
+} as const;
+
+/**
+ * Who signs the internship certificate.
+ *
+ * Separate from `signatory` on purpose: a certificate is issued by the company
+ * rather than by a named individual, so it is signed off by the team. Change
+ * this to a person's name if you would rather they signed personally.
+ */
+export const certificateSignatory = {
+  name: "HR Team",
+  designation: companyDetails.legalName,
 } as const;
 
 /**

@@ -1,105 +1,232 @@
 import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 
-import { companyDetails, signatory } from "@/lib/admin/hr/config";
+import {
+  certificateSignatory,
+  companyDetails,
+  signatory,
+} from "@/lib/admin/hr/config";
 import type { InternshipCertificateData } from "@/lib/admin/hr/schemas";
-import { LogoMark, SignatureBlock } from "../elements";
-import { base, formatDate, pdfColors, registerPdfFonts } from "../theme";
+import { LogoMark } from "../elements";
+import { formatDate, pdfColors, registerPdfFonts } from "../theme";
 
 /**
- * Internship certificate — landscape, and the only document designed to be
- * framed rather than filed.
+ * Internship certificate — the only document meant to be framed rather than
+ * filed, so it is the only one that abandons the letterhead layout.
  *
- * No diagonal watermark here: the mark is already the largest thing on the
- * sheet, and laying a second faint copy behind the recipient's own name is
- * exactly where a certificate starts looking cheap. Authenticity comes from the
- * reference number and the verification line in the footer instead.
+ * Structure follows the classic award certificate: a full-bleed coloured ground
+ * with a diagonal wedge and a wireframe mesh, a white card floating on top, a
+ * centred title, the recipient's name under a rule, and the sign-off along the
+ * bottom. Rendered in Ink & Amber rather than the usual navy and gold.
+ *
+ * No diagonal watermark: the ground already carries the brand, and a faint mark
+ * behind the recipient's own name is where a certificate starts looking cheap.
+ * Provenance comes from the reference and the verification line instead.
  */
+
+// A4 landscape, in points.
+const PAGE_W = 841.89;
+const PAGE_H = 595.28;
+
+// The white card, inset from the page edge.
+const CARD_X = 58;
+const CARD_Y = 54;
+const CARD_W = PAGE_W - CARD_X * 2;
+const CARD_H = PAGE_H - CARD_Y * 2;
 
 const styles = StyleSheet.create({
   page: {
     fontFamily: "NotoSans",
     fontSize: 11,
     color: pdfColors.body,
-    backgroundColor: "#ffffff",
+    backgroundColor: pdfColors.ink,
     padding: 0,
   },
-  // Amber spine down the left edge — the one strong colour, carrying the eye
-  // down to the signature.
-  spine: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    bottom: 0,
-    width: 14,
-    backgroundColor: pdfColors.brand,
-  },
-  frame: {
-    position: "absolute",
-    top: 22,
-    left: 36,
-    right: 22,
-    bottom: 22,
-    borderWidth: 0.75,
-    borderColor: pdfColors.hairline,
-  },
-  body: { paddingTop: 44, paddingBottom: 40, paddingLeft: 68, paddingRight: 54 },
 
-  head: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  brandRow: { flexDirection: "row", alignItems: "center", gap: 10 },
-  brandName: { fontSize: 16, fontWeight: 700, color: pdfColors.ink, letterSpacing: -0.2 },
-  reference: { fontSize: 8, color: pdfColors.muted, letterSpacing: 0.6 },
+  card: {
+    // Painted after the backdrop Views purely by tree order.
+    position: "absolute",
+    top: CARD_Y,
+    left: CARD_X,
+    width: CARD_W,
+    height: CARD_H,
+    backgroundColor: "#ffffff",
+    paddingTop: 44,
+    paddingBottom: 30,
+    paddingHorizontal: 54,
+  },
+
+  // Rotated rather than drawn as a polygon, since the backdrop cannot use Svg.
+  // Oversized and pushed off-page so the rotation never exposes a corner.
+  wedge: {
+    position: "absolute",
+    top: -140,
+    left: -190,
+    width: 420,
+    height: PAGE_H + 280,
+    backgroundColor: pdfColors.brand,
+    transform: "rotate(-10deg)",
+  },
+  wedgeEdge: {
+    position: "absolute",
+    top: -140,
+    left: 230,
+    width: 26,
+    height: PAGE_H + 280,
+    backgroundColor: pdfColors.brandDeep,
+    transform: "rotate(-10deg)",
+  },
+  mesh: { position: "absolute", height: 0.7 },
+  meshWarm: { backgroundColor: pdfColors.brandDeep, opacity: 0.5 },
+  meshCool: { backgroundColor: pdfColors.brand, opacity: 0.35 },
+
+  // Over the card's top-right corner, where the template puts its medal.
+  badge: {
+    position: "absolute",
+    top: CARD_Y - 22,
+    right: CARD_X - 4,
+  },
 
   eyebrow: {
-    marginTop: 34,
-    fontSize: 9,
-    letterSpacing: 3.4,
+    textAlign: "center",
+    fontSize: 8,
+    letterSpacing: 3,
     textTransform: "uppercase",
     color: pdfColors.brand,
     fontWeight: 700,
   },
   title: {
-    marginTop: 8,
-    fontSize: 31,
+    marginTop: 10,
+    textAlign: "center",
+    fontSize: 29,
     fontWeight: 700,
     color: pdfColors.ink,
-    letterSpacing: -0.9,
+    letterSpacing: 0.6,
   },
-  presented: { marginTop: 24, fontSize: 10, color: pdfColors.muted },
+  titleRule: {
+    alignSelf: "center",
+    marginTop: 12,
+    width: 74,
+    height: 3,
+    backgroundColor: pdfColors.brand,
+  },
+
+  awardedTo: {
+    marginTop: 20,
+    textAlign: "center",
+    fontSize: 10.5,
+    color: pdfColors.muted,
+  },
   name: {
-    marginTop: 7,
-    fontSize: 34,
+    marginTop: 10,
+    textAlign: "center",
+    fontSize: 36,
     fontWeight: 700,
     color: pdfColors.ink,
-    letterSpacing: -0.9,
+    letterSpacing: -0.6,
   },
   nameRule: {
-    marginTop: 12,
-    width: 190,
-    borderBottomWidth: 2.5,
-    borderBottomColor: pdfColors.brand,
+    alignSelf: "center",
+    marginTop: 10,
+    width: 380,
+    borderBottomWidth: 1,
+    borderBottomColor: pdfColors.hairline,
   },
 
-  citation: { marginTop: 20, fontSize: 11, lineHeight: 1.65, maxWidth: 470 },
+  citation: {
+    marginTop: 16,
+    marginHorizontal: 42,
+    textAlign: "center",
+    fontSize: 10.5,
+    lineHeight: 1.62,
+    color: pdfColors.body,
+  },
   strong: { color: pdfColors.ink, fontWeight: 700 },
 
-  facts: { flexDirection: "row", gap: 40, marginTop: 26 },
+  facts: {
+    marginTop: 18,
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 34,
+  },
+  fact: { alignItems: "center" },
   factLabel: {
-    fontSize: 7.5,
-    letterSpacing: 1.4,
+    fontSize: 7,
+    letterSpacing: 1.3,
     textTransform: "uppercase",
     color: pdfColors.muted,
     fontWeight: 700,
   },
-  factValue: { marginTop: 3, fontSize: 11, fontWeight: 700, color: pdfColors.ink },
+  factValue: { marginTop: 3, fontSize: 9.5, fontWeight: 700, color: pdfColors.ink },
 
-  foot: {
-    marginTop: 30,
+  // A flex spacer above this holds it to the bottom of the card, so the
+  // sign-off keeps the same baseline whatever the citation length.
+  footer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-end",
   },
-  verify: { fontSize: 7.5, color: pdfColors.muted, maxWidth: 250 },
+  signBlock: { width: 210 },
+  signRule: {
+    borderBottomWidth: 1,
+    borderBottomColor: pdfColors.ink,
+    marginBottom: 5,
+    height: 26,
+  },
+  signName: { fontSize: 10.5, fontWeight: 700, color: pdfColors.ink },
+  signRole: { fontSize: 8.5, color: pdfColors.muted },
+
+  verify: { width: 250, alignItems: "flex-end" },
+  verifyLabel: {
+    fontSize: 7,
+    letterSpacing: 1.3,
+    textTransform: "uppercase",
+    color: pdfColors.muted,
+    fontWeight: 700,
+  },
+  verifyRef: {
+    marginTop: 3,
+    fontSize: 10,
+    fontWeight: 700,
+    color: pdfColors.ink,
+    letterSpacing: 0.3,
+  },
+  verifyText: {
+    marginTop: 5,
+    fontSize: 7,
+    lineHeight: 1.5,
+    color: pdfColors.muted,
+    textAlign: "right",
+  },
 });
+
+/**
+ * The coloured ground: an ink field with an amber wedge down the left and a few
+ * mesh lines in the corners the card does not cover.
+ *
+ * Built from rotated Views rather than an Svg. react-pdf paints an Svg after
+ * its siblings whatever the tree order, so an Svg backdrop covers the card
+ * completely and no amount of ordering or zIndex rescues it. Views respect tree
+ * order, which is also how the letter watermark sits behind its body text.
+ */
+function Backdrop() {
+  return (
+    <>
+      <View style={styles.wedge} />
+      <View style={styles.wedgeEdge} />
+
+      {/* Mesh over the amber, top-left. */}
+      <View style={[styles.mesh, styles.meshWarm, { top: 84, left: -40, width: 250, transform: "rotate(-52deg)" }]} />
+      <View style={[styles.mesh, styles.meshWarm, { top: 150, left: -70, width: 320, transform: "rotate(-41deg)" }]} />
+      <View style={[styles.mesh, styles.meshWarm, { top: 96, left: -30, width: 240, transform: "rotate(54deg)" }]} />
+      <View style={[styles.mesh, styles.meshWarm, { top: 212, left: -10, width: 170, transform: "rotate(0deg)" }]} />
+
+      {/* And over the ink, bottom-right. */}
+      <View style={[styles.mesh, styles.meshCool, { top: 470, left: 640, width: 250, transform: "rotate(-38deg)" }]} />
+      <View style={[styles.mesh, styles.meshCool, { top: 430, left: 560, width: 360, transform: "rotate(-30deg)" }]} />
+      <View style={[styles.mesh, styles.meshCool, { top: 520, left: 600, width: 300, transform: "rotate(-46deg)" }]} />
+    </>
+  );
+}
 
 export function InternshipCertificate({
   data,
@@ -119,34 +246,23 @@ export function InternshipCertificate({
       subject={reference}
     >
       <Page size="A4" orientation="landscape" style={styles.page}>
-        <View style={styles.spine} fixed />
-        <View style={styles.frame} fixed />
+        <Backdrop />
 
-        <View style={styles.body}>
-          <View style={styles.head}>
-            <View style={styles.brandRow}>
-              <LogoMark size={34} />
-              <View>
-                <Text style={styles.brandName}>{companyDetails.legalName}</Text>
-                <Text style={[base.small, { fontSize: 7.5 }]}>
-                  {companyDetails.website}
-                </Text>
-              </View>
-            </View>
-            <Text style={styles.reference}>{reference}</Text>
-          </View>
+        <View style={styles.card}>
+          <Text style={styles.eyebrow}>{companyDetails.legalName}</Text>
+          <Text style={styles.title}>CERTIFICATE OF INTERNSHIP</Text>
+          <View style={styles.titleRule} />
 
-          <Text style={styles.eyebrow}>Certificate of Internship</Text>
-          <Text style={styles.title}>This is to certify that</Text>
-
-          <Text style={styles.presented}>Presented to</Text>
+          <Text style={styles.awardedTo}>
+            This internship certificate is proudly awarded to
+          </Text>
           <Text style={styles.name}>{employeeName}</Text>
           <View style={styles.nameRule} />
 
           <Text style={styles.citation}>
-            has successfully completed an internship as a{" "}
+            for the successful completion of an internship as a{" "}
             <Text style={styles.strong}>{data.role}</Text> at{" "}
-            <Text style={styles.strong}>{companyDetails.legalName}</Text> from{" "}
+            <Text style={styles.strong}>{companyDetails.legalName}</Text>, from{" "}
             <Text style={styles.strong}>{formatDate(data.startDate)}</Text> to{" "}
             <Text style={styles.strong}>{formatDate(data.endDate)}</Text>.
             {data.focusArea ? ` ${data.focusArea}` : ""}
@@ -154,30 +270,46 @@ export function InternshipCertificate({
           </Text>
 
           <View style={styles.facts}>
-            <View>
+            <View style={styles.fact}>
               <Text style={styles.factLabel}>Role</Text>
               <Text style={styles.factValue}>{data.role}</Text>
             </View>
-            <View>
+            <View style={styles.fact}>
               <Text style={styles.factLabel}>Duration</Text>
               <Text style={styles.factValue}>
                 {formatDate(data.startDate)} — {formatDate(data.endDate)}
               </Text>
             </View>
-            <View>
+            <View style={styles.fact}>
               <Text style={styles.factLabel}>Issued</Text>
               <Text style={styles.factValue}>{formatDate(data.issuedOn)}</Text>
             </View>
           </View>
 
-          <View style={styles.foot}>
-            <Text style={styles.verify}>
-              Issued at {signatory.place}. This certificate carries the reference{" "}
-              {reference}; its authenticity can be confirmed with{" "}
-              {companyDetails.legalName} at {companyDetails.email}.
-            </Text>
-            <SignatureBlock label={`For ${companyDetails.legalName}`} />
+          <View style={{ flexGrow: 1 }} />
+
+          <View style={styles.footer}>
+            <View style={styles.signBlock}>
+              <View style={styles.signRule} />
+              <Text style={styles.signName}>{certificateSignatory.name}</Text>
+              <Text style={styles.signRole}>{certificateSignatory.designation}</Text>
+            </View>
+
+            <View style={styles.verify}>
+              <Text style={styles.verifyLabel}>Certificate reference</Text>
+              <Text style={styles.verifyRef}>{reference}</Text>
+              <Text style={styles.verifyText}>
+                Issued at {signatory.place} on {formatDate(data.issuedOn)}. Verify this
+                certificate by quoting the reference above to{" "}
+                {companyDetails.email}.
+              </Text>
+            </View>
           </View>
+        </View>
+
+        {/* Over the card's corner, where the template puts its medal. */}
+        <View style={styles.badge}>
+          <LogoMark size={52} />
         </View>
       </Page>
     </Document>
